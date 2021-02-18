@@ -33,7 +33,7 @@ function runAction() {
             "ADD employee",
             "VIEW department",
             "VIEW role",
-            "view employee",
+            "VIEW employee",
             "UPDATE department",
             "UPDATE role",
             "UPDATE employee",
@@ -145,30 +145,42 @@ function addEmployee() {
       inquirer
       .prompt([
         {
-        name: "employee",
+        name: "first_name",
         type: "input",
         message: "What is the employee first name?" 
       },
       {
-        name: "employee",
+        name: "last_name",
         type: "input",
         message: "What is the employee last name?" 
       },
       
         {
-          name: "employee",
+          name: "role_id",
           type: "input",
           message: "What is the employee role_id?" 
         },
 
         {
-          name: "employee",
+          name: "manager_id",
           type: "input",
           message: "What is the employee manager_id?" 
         }
       ])
-      .then(function(answer) {
-        console.log("answer",answer);
+      .then(function(answers) {
+        console.log("answer",answers);
+          var query = "INSERT INTO employee SET ?";
+            connection.query(query, 
+              { 
+                first_name: answers.first_name ,
+                last_name: answers.last_name ,
+                manager_id: answers.manager_id,
+                role_id: answers.role_id
+            },
+               function(err, res) {
+              if (err) throw err;
+             console.log("your employee was created");
+            });
         runAction();
       });
       }
@@ -182,7 +194,8 @@ function viewDepartment() {
         "id: " +
           res[i].id +
           " || name: " +
-          res[i].name 
+          res[i].name  
+          
       );
     }
     runAction();
@@ -190,22 +203,44 @@ function viewDepartment() {
 }
 
 function viewRole() {
-  inquirer
-  .prompt({
-  })
-  .then(function(answer) {
-    console.log("answer",answer);
+  var query = "SELECT * FROM role";
+  connection.query(query, function(err, res) {
+    if (err) throw err;
+    for (var i = 0; i < res.length; i++) {
+      console.log(
+        "id: " +
+          res[i].id +
+          " || title: " +
+          res[i].title  +
+          " || salary: " +
+          res[i].salary +
+          " || deparment_id: " +
+          res[i].deparment_id
+      );
+    }
     runAction();
   });
 }
 
 
 function viewEmployee() {
-  inquirer
-  .prompt({
-  })
-  .then(function(answer) {
-    console.log("answer",answer);
+  var query = "SELECT * FROM employee";
+  connection.query(query, function(err, res) {
+    if (err) throw err;
+    for (var i = 0; i < res.length; i++) {
+      console.log(
+        "id: " +
+          res[i].id +
+          " || firstName: " +
+          res[i].first_name  +
+          " || lastName: " +
+          res[i].last_name +
+          " || role_id: " +
+          res[i].role_id +
+          " || manager_id: " +
+          res[i].manager_id
+      );
+    }
     runAction();
   });
 }
@@ -245,23 +280,69 @@ function updateDepartment() {
 
 function updateRole() {
   inquirer
-  .prompt({
+  .prompt([
+    {
+      name: "role",
+      type: "input",
+      message: "which role would you like to update?"
+    },
+    {
+      name: "newRole",
+      type: "input",
+      message: "what is the role update ?"
     
-  })
-  .then(function(answer) {
-    console.log("answer",answer);
-    runAction();
+  },
+ ])
+  .then(function(answers) {
+    var query = "UPDATE role SET title = ? WHERE title = ?"
+
+    connection.query( query, 
+      [
+        answers.newRole, 
+        answers.role,
+      ], 
+      
+      function(error) {
+        if (error) throw err;
+      console.log("role updated successfully!");
+      runAction();
+   }
+  )
   });
 }
 
 function updateEmployee() {
   inquirer
-  .prompt({
+  .prompt([
+    {
+      name: "employee",
+      type: "input",
+      message: "which employe would you like to update?"
+    },
+    {
+      name: "newEmployee",
+      type: "input",
+      message: "what is the employee update ?"
     
-  })
-  .then(function(answer) {
-    console.log("answer",answer);
+  },
+ ])
+  .then(function(answers) {
+
+    var query = "UPDATE employee SET first_name = ? WHERE first_name = ?"
+
+    connection.query( query, 
+      [
+        answers.newEmployee, 
+        answers.employee,
+      ], 
+      
+      function(error) {
+        if (error) throw err;
+    console.log("employee updated successfully!");
     runAction();
+  }
+  )
   });
 }
+
 
